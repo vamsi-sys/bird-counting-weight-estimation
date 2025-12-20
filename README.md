@@ -1,125 +1,172 @@
-# Bird Counting & Weight Estimation from CCTV Video
+🐔 Bird Counting & Weight Estimation System
 
-## Overview
-This project is a prototype system that analyzes fixed-camera poultry CCTV videos to:
-- Count birds over time using detection and tracking
-- Estimate bird weight from video using a proxy method
-- Generate annotated video outputs
-- Expose results via a minimal FastAPI service
+A computer vision–based system for automatic bird counting and approximate weight estimation from poultry farm videos using YOLOv8, object tracking, and a FastAPI backend.
 
-The solution is designed for ML evaluation and demonstrates practical handling of detection, tracking, analytics, and API design.
+This project was built as part of an ML Intern technical assignment and focuses on real-world applicability, clean architecture, and explainability.
 
----
+📌 Problem Statement
 
-## Features
-- Bird detection using YOLOv8
-- Stable bird tracking with unique IDs (prevents double counting)
-- Bird count over time (timestamp → count)
-- Weight estimation using bounding-box area proxy
-- Annotated output video with bounding boxes, IDs, and count overlay
-- FastAPI-based inference service
-- Performance optimizations (frame skipping, resizing, model warm-up)
+Manual bird counting and weight monitoring in poultry farms is:
 
----
+Time-consuming
 
-## Tech Stack
-- Python 3.10
-- Ultralytics YOLOv8
-- ByteTrack (via YOLO tracking)
-- OpenCV
-- FastAPI
+Error-prone
 
----
+Not scalable
 
-## Setup Instructions
+This system automates:
 
-```bash
+Unique bird counting from video streams
+
+Approximate weight estimation
+
+Annotated video generation
+
+Structured JSON output for analytics
+
+🚀 Features
+
+🎯 YOLOv8-based bird detection
+
+🔁 Object tracking to avoid double counting
+
+⚖️ Heuristic weight estimation per bird
+
+🎥 Annotated output video
+
+🌐 REST API built with FastAPI
+
+📄 Clean JSON response for downstream usage
+
+🗂️ Project Structure
+bird-counting-weight-estimation/
+│
+├── app/
+│   ├── __init__.py
+│   ├── main.py          # FastAPI entry point
+│   ├── detector.py      # YOLOv8 detection logic
+│   ├── tracker.py       # Bird tracking & counting
+│   └── weight.py        # Weight estimation logic
+│
+├── data/
+│   └── poultry.mp4      # Sample input video
+│
+├── models/
+│   └── yolov8n.pt       # YOLOv8 model weights
+│
+├── outputs/
+│   ├── annotated_video.mp4
+│   └── sample_response.json
+│
+├── requirements.txt
+├── .gitignore
+└── README.md
+
+⚙️ Installation
+1️⃣ Clone the repository
+git clone https://github.com/vamsi-sys/bird-counting-weight-estimation.git
+cd bird-counting-weight-estimation
+
+2️⃣ Create and activate virtual environment
 python -m venv venv
+
+
+Windows
+
 venv\Scripts\activate
+
+
+Linux / Mac
+
+source venv/bin/activate
+
+3️⃣ Install dependencies
 pip install -r requirements.txt
-Run the API
-bash
-Copy code
-python -m uvicorn app.main:app --reload
-The server will start at:
 
-cpp
-Copy code
+▶️ Running the Application
+
+Start the FastAPI server:
+
+uvicorn app.main:app --reload
+
+
+Server will run at:
+
 http://127.0.0.1:8000
-API Endpoints
-Health Check
-bash
-Copy code
-GET /health
-Response:
 
-json
-Copy code
-{ "status": "ok" }
-Analyze Video
-bash
-Copy code
+🔌 API Usage
+Endpoint: Analyze Video
+
 POST /analyze-video
-Request
 
-Content-Type: multipart/form-data
+Example using curl
+curl -X POST "http://127.0.0.1:8000/analyze-video" \
+     -F "file=@data/poultry.mp4"
 
-Key: file
-
-Value: CCTV video file (.mp4, .avi, .mov)
-
-Sample Response
-
-json
-Copy code
+📤 Sample JSON Response
 {
-  "frames_processed": 1243,
-  "unique_birds": 56,
-  "counts_over_time": [
-    { "time_sec": 0, "count": 12 },
-    { "time_sec": 5, "count": 21 }
+  "frames_processed": 620,
+  "unique_birds_detected": 47,
+  "average_weight_kg": 2.1,
+  "bird_weights": [
+    { "id": 1, "estimated_weight": 2.0 },
+    { "id": 2, "estimated_weight": 2.3 }
   ],
-  "tracks_sample": [
-    { "id": 3, "bbox": [120.5, 45.2, 200.1, 180.6] }
-  ],
-  "weight_estimation": {
-    "average_grams": 1450,
-    "min_grams": 1200,
-    "max_grams": 1800
-  },
-  "processing_time_sec": 289.4,
-  "fps": 4.3,
-  "annotated_video": "outputs/annotated_video.mp4"
+  "output_video": "outputs/annotated_video.mp4"
 }
 
+🧠 How It Works
 
-Bird Counting Method
-Birds are detected in each frame using YOLOv8.
+Detection
 
-Tracking IDs are assigned using ByteTrack.
+YOLOv8 detects birds frame-by-frame
 
-Unique tracking IDs ensure birds are not double-counted.
+Tracking
 
-Occlusions and temporary disappearances are handled via tracker persistence.
+Tracks objects across frames to ensure unique counting
 
-Weight Estimation Method
-Weight is estimated using bounding-box area as a proxy for bird body size.
+Weight Estimation
 
-Larger bounding box → larger estimated weight.
+Uses bounding-box area heuristics for approximate weight
 
-This produces a relative weight index.
+Output
 
-To convert estimates to true grams accurately, additional data is required:
+Annotated video + structured JSON result
 
-Camera calibration (distance, height, focal length), or
+📦 Outputs
 
-Labeled bird weights to train a regression model.
+🎥 outputs/annotated_video.mp4
+→ Video with bounding boxes, IDs, and counts
 
-Outputs
-Annotated video with bounding boxes, tracking IDs, and live count overlay
+📄 outputs/sample_response.json
+→ Machine-readable analytics output
 
-JSON response with counts, tracks sample, and weight estimates
+🧪 Limitations & Assumptions
 
-Notes
-This is a prototype ML system designed for evaluation purposes.
-Accuracy can be improved using depth estimation, multi-camera setups, or supervised weight regression models.
+Weight estimation is approximate, not medical-grade
+
+Designed for top-view or angled farm videos
+
+Model accuracy depends on video quality and lighting
+
+🔮 Future Improvements
+
+Calibration-based weight estimation
+
+Support for live RTSP camera feeds
+
+Model fine-tuning on poultry-specific datasets
+
+Database integration for long-term analytics
+
+Dockerized deployment
+
+🧾 License
+
+This project is released under the MIT License.
+You are free to use, modify, and distribute it.
+
+👤 Author
+
+Vamsikrishna Sirimalla
+GitHub: https://github.com/vamsi-sys
