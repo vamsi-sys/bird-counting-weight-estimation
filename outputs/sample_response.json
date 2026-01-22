@@ -1,0 +1,39 @@
+{
+  "frames_processed" : 621,
+"unique_birds" : 42,
+"counts over time" : [
+{
+"time_sec" : 5,
+"count" : 7
+},
+{
+"time_sec" : 10,
+"count" : 12
+},
+{
+"time_sec" : 15,
+"count" : 20
+},
+{
+"time_sec" : 20,
+"count" : 23
+},
+{
+"time_sec" : 25,
+"count" : 26
+},
+{
+"time_sec" : 30,
+"count" : 34,
+},
+{
+
+
+Response Headers
+content-length : 969
+content-type : application/json
+date: Thu, 22 Jan 2026
+server: uvicorn
+
+
+
