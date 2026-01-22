@@ -26,6 +26,8 @@ Structured JSON output for analytics
 
 🚀 Features
 
+📊 Aggregated weight statistics (average / min / max) to avoid misleading per-frame weight noise
+
 🎯 YOLOv8-based bird detection
 
 🔁 Object tracking to avoid double counting
@@ -38,6 +40,9 @@ Structured JSON output for analytics
 
 📄 Clean JSON response for downstream usage
 
+• Bird count over time (timestamp → count) using tracking IDs
+Instead of counting per frame, the system tracks unique bird IDs and records population count at fixed time intervals.
+
 🗂️ Project Structure
 bird-counting-weight-estimation/
 │
@@ -48,8 +53,6 @@ bird-counting-weight-estimation/
 │   ├── tracker.py       # Bird tracking & counting
 │   └── weight.py        # Weight estimation logic
 │
-├── data/
-│   └── poultry.mp4      # Sample input video
 │
 ├── models/
 │   └── yolov8n.pt       # YOLOv8 model weights
@@ -102,18 +105,38 @@ POST /analyze-video
 Example using curl
 curl -X POST "http://127.0.0.1:8000/analyze-video" \
      -F "file=@data/poultry.mp4"
+     
+🎗️🎗️### Health Check
+GET /health
+
+Response:
+{
+  "status": "ok"
+}
 
 📤 Sample JSON Response
 {
-  "frames_processed": 620,
-  "unique_birds_detected": 47,
-  "average_weight_kg": 2.1,
-  "bird_weights": [
-    { "id": 1, "estimated_weight": 2.0 },
-    { "id": 2, "estimated_weight": 2.3 }
+  "frames_processed": 1243,
+  "unique_birds": 56,
+  "counts_over_time": [
+    { "time_sec": 0, "count": 12 },
+    { "time_sec": 5, "count": 21 },
+    { "time_sec": 10, "count": 34 }
   ],
-  "output_video": "outputs/annotated_video.mp4"
+  "tracks_sample": [
+    { "id": 3, "bbox": [120.5, 45.2, 200.1, 180.6] },
+    { "id": 7, "bbox": [310.4, 90.8, 420.2, 230.1] }
+  ],
+  "weight_estimation": {
+    "average_grams": 1450.3,
+    "min_grams": 1200.7,
+    "max_grams": 1805.9
+  },
+  "processing_time_sec": 289.4,
+  "fps": 4.3,
+  "annotated_video": "outputs/annotated_video.mp4"
 }
+Note: Weight values are proxy-based estimates derived from bounding-box area and represent relative scale, not calibrated physical measurements.
 
 🧠 How It Works
 
@@ -132,6 +155,25 @@ Uses bounding-box area heuristics for approximate weight
 Output
 
 Annotated video + structured JSON result
+
+📌 Weight Estimation Design Note
+
+Bird weight is estimated using bounding-box area as a proxy, which varies across frames due to movement and camera angle.
+Weight estimation is heuristic and based on bounding-box area as a proxy for bird size.
+Actual gram-level accuracy requires camera calibration or labeled training data.
+
+To avoid misleading precision, the system reports **aggregated statistics**:
+- Average estimated weight
+- Minimum estimated weight
+- Maximum estimated weight
+
+Per-bird or per-frame weights are intentionally not exposed, as they are unstable without camera calibration.
+• ⭐⭐ Individual bird weights are not exported to avoid frame-level estimation noise
+
+## Performance Optimizations
+- Model warm-up at startup to avoid first-request latency
+- Frame skipping to reduce inference load
+- Frame resizing for faster processing
 
 📦 Outputs
 
