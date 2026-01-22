@@ -49,8 +49,9 @@ This system automates:
 ```bash
 git clone https://github.com/vamsi-sys/bird-counting-weight-estimation.git
 cd bird-counting-weight-estimation
-
-###2️⃣ Create and activate virtual environment
+```
+###2️⃣ Create and activate virtual environmen
+```bash
 python -m venv venv
 
 Windows
@@ -61,12 +62,13 @@ venv\Scripts\activate
 Linux / Mac
 
 source venv/bin/activate
-
+```
 ###3️⃣ Install dependencies
+```bash
 pip install -r requirements.txt
-
+```
 ##▶️ Running the Application
-
+```bash
 Start the FastAPI server:
 
 python -m uvicorn app.main:app --reload
@@ -75,8 +77,9 @@ python -m uvicorn app.main:app --reload
 Server will run at:
 
 http://127.0.0.1:8000
-
+```
 ##🔌 API Usage
+```bash
 Health Check
 GET /health
 
@@ -90,7 +93,6 @@ Response:
 Analyze Video
 POST /analyze-video
 
-
 Request
 
 Content-Type: multipart/form-data
@@ -103,8 +105,9 @@ Example (curl):
 
 curl -X POST "http://127.0.0.1:8000/analyze-video" \
 -F "file=@poultry.mp4"
-
+```
 ##📤 Sample JSON Response
+```bash
 {
   "frames_processed": 1243,
   "unique_birds": 56,
@@ -122,8 +125,9 @@ curl -X POST "http://127.0.0.1:8000/analyze-video" \
   },
   "annotated_video": "outputs/annotated_video.mp4"
 }
-
+```
 ##🧠 How It Works
+```bash
 Detection
 
 YOLOv8 detects birds frame-by-frame from the input video.
@@ -149,31 +153,31 @@ Output
 Annotated video with bounding boxes, IDs, and live count
 
 Structured JSON analytics response
-
+```
 ##⚡ Performance Optimizations
-
+```bash
 Model warm-up at application startup to avoid first-request latency
 
 Frame skipping to reduce inference load
 
 Frame resizing for faster processing while maintaining accuracy
-
+```
 ##📦 Outputs
-
+```bash
 🎥 outputs/annotated_video.mp4 → Annotated video output
 
 📄 sample_response.json → Example analytics response
-
+```
 ##🧪 Limitations & Assumptions
-
+```bash
 Weight estimation is approximate and proxy-based
 
 Designed for fixed-camera poultry farm videos
 
 Accuracy depends on video quality, angle, and lighting
-
+```
 ##🔮 Future Improvements
-
+```bash
 Camera calibration for accurate weight estimation
 
 Support for live RTSP camera feeds
@@ -183,7 +187,7 @@ Model fine-tuning on poultry-specific datasets
 Database integration for long-term analytics
 
 Dockerized deployment
-
+```
 ##🧾 License
 
 This project is released under the MIT License.
