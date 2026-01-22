@@ -49,9 +49,9 @@ This system automates:
 ```bash
 git clone https://github.com/vamsi-sys/bird-counting-weight-estimation.git
 cd bird-counting-weight-estimation
-2️⃣ Create and activate virtual environment
-python -m venv venv
 
+###2️⃣ Create and activate virtual environment
+python -m venv venv
 
 Windows
 
@@ -62,10 +62,10 @@ Linux / Mac
 
 source venv/bin/activate
 
-3️⃣ Install dependencies
+###3️⃣ Install dependencies
 pip install -r requirements.txt
 
-▶️ Running the Application
+##▶️ Running the Application
 
 Start the FastAPI server:
 
@@ -76,7 +76,7 @@ Server will run at:
 
 http://127.0.0.1:8000
 
-🔌 API Usage
+##🔌 API Usage
 Health Check
 GET /health
 
@@ -104,7 +104,7 @@ Example (curl):
 curl -X POST "http://127.0.0.1:8000/analyze-video" \
 -F "file=@poultry.mp4"
 
-📤 Sample JSON Response
+##📤 Sample JSON Response
 {
   "frames_processed": 1243,
   "unique_birds": 56,
@@ -123,7 +123,7 @@ curl -X POST "http://127.0.0.1:8000/analyze-video" \
   "annotated_video": "outputs/annotated_video.mp4"
 }
 
-🧠 How It Works
+##🧠 How It Works
 Detection
 
 YOLOv8 detects birds frame-by-frame from the input video.
@@ -150,7 +150,7 @@ Annotated video with bounding boxes, IDs, and live count
 
 Structured JSON analytics response
 
-⚡ Performance Optimizations
+##⚡ Performance Optimizations
 
 Model warm-up at application startup to avoid first-request latency
 
@@ -158,13 +158,13 @@ Frame skipping to reduce inference load
 
 Frame resizing for faster processing while maintaining accuracy
 
-📦 Outputs
+##📦 Outputs
 
 🎥 outputs/annotated_video.mp4 → Annotated video output
 
 📄 sample_response.json → Example analytics response
 
-🧪 Limitations & Assumptions
+##🧪 Limitations & Assumptions
 
 Weight estimation is approximate and proxy-based
 
@@ -172,7 +172,7 @@ Designed for fixed-camera poultry farm videos
 
 Accuracy depends on video quality, angle, and lighting
 
-🔮 Future Improvements
+##🔮 Future Improvements
 
 Camera calibration for accurate weight estimation
 
@@ -184,12 +184,12 @@ Database integration for long-term analytics
 
 Dockerized deployment
 
-🧾 License
+##🧾 License
 
 This project is released under the MIT License.
 You are free to use, modify, and distribute it.
 
-👤 Author
+###👤 Author
 
 Vamsikrishna Sirimalla
 GitHub: https://github.com/vamsi-sys
