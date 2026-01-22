@@ -1,75 +1,54 @@
-🐔 Bird Counting & Weight Estimation System
+# 🐔 Bird Counting & Weight Estimation System
 
-A computer vision–based system for automatic bird counting and approximate weight estimation from poultry farm videos using YOLOv8, object tracking, and a FastAPI backend.
+An end-to-end computer vision system for **automatic bird counting and approximate weight estimation** from poultry farm CCTV videos using **YOLOv8, object tracking, and a FastAPI backend**.
 
-This project was built as part of an ML Intern technical assignment and focuses on real-world applicability, clean architecture, and explainability.
+This project was built as part of an **ML Intern technical assignment** and focuses on **real-world applicability, clean architecture, and explainability**.
 
-📌 Problem Statement
+---
+
+## 📌 Problem Statement
 
 Manual bird counting and weight monitoring in poultry farms is:
 
-Time-consuming
-
-Error-prone
-
-Not scalable
+- Time-consuming  
+- Error-prone  
+- Not scalable  
 
 This system automates:
 
-Unique bird counting from video streams
+- **Unique bird counting** from video streams  
+- **Bird count over time (timestamp → count)**  
+- **Approximate weight estimation using a video-based proxy**  
+- **Annotated video generation**  
+- **Structured JSON output for analytics**
 
-Approximate weight estimation
+---
 
-Annotated video generation
+## 🚀 Features
 
-Structured JSON output for analytics
+- 🎯 YOLOv8-based bird detection  
+- 🔁 Object tracking with unique IDs to avoid double counting  
+- 📊 Bird count over time using tracking IDs  
+- ⚖️ Heuristic weight estimation per bird (proxy-based)  
+- 🎥 Annotated output video with bounding boxes, IDs, and live count  
+- 🌐 REST API built with FastAPI  
+- 📄 Clean JSON response for downstream analytics  
+- ⚡ Performance optimizations (model warm-up, frame skipping, resizing)
 
-🚀 Features
+---
 
-📊 Aggregated weight statistics (average / min / max) to avoid misleading per-frame weight noise
+## 🗂️ Project Structure
 
-🎯 YOLOv8-based bird detection
+<img width="462" height="673" alt="image" src="https://github.com/user-attachments/assets/4cfbc700-12f4-4dd3-991f-11d2b3463c85" />
 
-🔁 Object tracking to avoid double counting
+---
 
-⚖️ Heuristic weight estimation per bird
+## ⚙️ Installation
 
-🎥 Annotated output video
-
-🌐 REST API built with FastAPI
-
-📄 Clean JSON response for downstream usage
-
-• Bird count over time (timestamp → count) using tracking IDs
-Instead of counting per frame, the system tracks unique bird IDs and records population count at fixed time intervals.
-
-🗂️ Project Structure
-bird-counting-weight-estimation/
-│
-├── app/
-│   ├── __init__.py
-│   ├── main.py          # FastAPI entry point
-│   ├── detector.py      # YOLOv8 detection logic
-│   ├── tracker.py       # Bird tracking & counting
-│   └── weight.py        # Weight estimation logic
-│
-│
-├── models/
-│   └── yolov8n.pt       # YOLOv8 model weights
-│
-├── outputs/
-│   ├── annotated_video.mp4
-│   └── sample_response.json
-│
-├── requirements.txt
-├── .gitignore
-└── README.md
-
-⚙️ Installation
-1️⃣ Clone the repository
+### 1️⃣ Clone the repository
+```bash
 git clone https://github.com/vamsi-sys/bird-counting-weight-estimation.git
 cd bird-counting-weight-estimation
-
 2️⃣ Create and activate virtual environment
 python -m venv venv
 
@@ -90,7 +69,7 @@ pip install -r requirements.txt
 
 Start the FastAPI server:
 
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload
 
 
 Server will run at:
@@ -98,21 +77,32 @@ Server will run at:
 http://127.0.0.1:8000
 
 🔌 API Usage
-Endpoint: Analyze Video
-
-POST /analyze-video
-
-Example using curl
-curl -X POST "http://127.0.0.1:8000/analyze-video" \
-     -F "file=@data/poultry.mp4"
-     
-🎗️🎗️### Health Check
+Health Check
 GET /health
 
+
 Response:
+
 {
   "status": "ok"
 }
+
+Analyze Video
+POST /analyze-video
+
+
+Request
+
+Content-Type: multipart/form-data
+
+Key: file
+
+Value: CCTV video file (.mp4, .avi, .mov)
+
+Example (curl):
+
+curl -X POST "http://127.0.0.1:8000/analyze-video" \
+-F "file=@poultry.mp4"
 
 📤 Sample JSON Response
 {
@@ -120,80 +110,71 @@ Response:
   "unique_birds": 56,
   "counts_over_time": [
     { "time_sec": 0, "count": 12 },
-    { "time_sec": 5, "count": 21 },
-    { "time_sec": 10, "count": 34 }
+    { "time_sec": 5, "count": 21 }
   ],
   "tracks_sample": [
-    { "id": 3, "bbox": [120.5, 45.2, 200.1, 180.6] },
-    { "id": 7, "bbox": [310.4, 90.8, 420.2, 230.1] }
+    { "id": 3, "bbox": [120.5, 45.2, 200.1, 180.6] }
   ],
   "weight_estimation": {
-    "average_grams": 1450.3,
-    "min_grams": 1200.7,
-    "max_grams": 1805.9
+    "average_grams": 1450,
+    "min_grams": 1200,
+    "max_grams": 1800
   },
-  "processing_time_sec": 289.4,
-  "fps": 4.3,
   "annotated_video": "outputs/annotated_video.mp4"
 }
-Note: Weight values are proxy-based estimates derived from bounding-box area and represent relative scale, not calibrated physical measurements.
 
 🧠 How It Works
-
 Detection
 
-YOLOv8 detects birds frame-by-frame
+YOLOv8 detects birds frame-by-frame from the input video.
 
-Tracking
+Tracking & Counting
 
-Tracks objects across frames to ensure unique counting
+Detected birds are assigned unique tracking IDs, which allows:
+
+Stable tracking across frames
+
+Avoidance of double counting
+
+Accurate bird count over time
 
 Weight Estimation
 
-Uses bounding-box area heuristics for approximate weight
+Weight estimation is heuristic and proxy-based, using bounding-box area as an indicator of bird size.
+
+Actual gram-level accuracy would require camera calibration or labeled training data.
 
 Output
 
-Annotated video + structured JSON result
+Annotated video with bounding boxes, IDs, and live count
 
-📌 Weight Estimation Design Note
+Structured JSON analytics response
 
-Bird weight is estimated using bounding-box area as a proxy, which varies across frames due to movement and camera angle.
-Weight estimation is heuristic and based on bounding-box area as a proxy for bird size.
-Actual gram-level accuracy requires camera calibration or labeled training data.
+⚡ Performance Optimizations
 
-To avoid misleading precision, the system reports **aggregated statistics**:
-- Average estimated weight
-- Minimum estimated weight
-- Maximum estimated weight
+Model warm-up at application startup to avoid first-request latency
 
-Per-bird or per-frame weights are intentionally not exposed, as they are unstable without camera calibration.
-• ⭐⭐ Individual bird weights are not exported to avoid frame-level estimation noise
+Frame skipping to reduce inference load
 
-## Performance Optimizations
-- Model warm-up at startup to avoid first-request latency
-- Frame skipping to reduce inference load
-- Frame resizing for faster processing
+Frame resizing for faster processing while maintaining accuracy
 
 📦 Outputs
 
-🎥 outputs/annotated_video.mp4
-→ Video with bounding boxes, IDs, and counts
+🎥 outputs/annotated_video.mp4 → Annotated video output
 
-📄 outputs/sample_response.json
-→ Machine-readable analytics output
+📄 sample_response.json → Example analytics response
 
 🧪 Limitations & Assumptions
 
-Weight estimation is approximate, not medical-grade
+Weight estimation is approximate and proxy-based
 
-Designed for top-view or angled farm videos
+Designed for fixed-camera poultry farm videos
 
-Model accuracy depends on video quality and lighting
+Accuracy depends on video quality, angle, and lighting
 
 🔮 Future Improvements
 
-Calibration-based weight estimation
+Camera calibration for accurate weight estimation
 
 Support for live RTSP camera feeds
 
